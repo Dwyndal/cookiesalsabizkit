@@ -50,13 +50,20 @@
     font-weight:400;
     letter-spacing: .02em;
   }
-  header p.sub{
-    margin: 10px 0 0;
+
+  /* ---------- info bar (below the carousel — instructions, not the tribute) ---------- */
+  .info{
+    flex: 0 0 auto;
+    text-align:center;
+    padding: clamp(10px, 2vh, 18px) 20px 0;
+  }
+  .info p.sub{
+    margin: 0;
     font-size: clamp(12px, 1.3vw, 15px);
     color: var(--dim);
     font-weight:400;
   }
-  header p.hint{
+  .info p.hint{
     margin: 4px 0 0;
     font-size: clamp(11px, 1.1vw, 13px);
     color: var(--dim);
@@ -178,6 +185,40 @@
     main{ gap: 14px; }
     .pane.center .frame{ width: min(78vw, 340px); }
   }
+
+  /* =================== TV / full-size view ===================
+     Activated by ?view=tv in the URL. Strips everything down to
+     just the current photo, filling as much of the screen as
+     possible — meant for a TV or a dedicated display, not for
+     browsing. */
+  body.tv-mode header,
+  body.tv-mode footer,
+  body.tv-mode .info,
+  body.tv-mode .pane.side,
+  body.tv-mode .arrow{
+    display: none;
+  }
+  body.tv-mode main{ padding:0; }
+  body.tv-mode .pane.center .frame{
+    width: 96vw;
+    height: 92vh;
+    max-width: none;
+    aspect-ratio: unset;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  #tvLink{
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--dim);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 5px 14px;
+  }
+  #tvLink:hover{ color: var(--gold); border-color: var(--gold); }
 </style>
 </head>
 <body>
@@ -185,8 +226,6 @@
 <header>
   <h1>Carol Ann Vines Moore</h1>
   <p class="dates">April 28, 1945 — August 20, 2026</p>
-  <p class="sub">Photos rotate on their own &middot; open this page any time to join in</p>
-  <p class="hint" id="arrowHint">Use the arrows to look back or ahead — it returns to the live rotation after a few quiet seconds</p>
 </header>
 
 <main>
@@ -221,6 +260,12 @@
   <button class="arrow" id="nextBtn" aria-label="Next photo">&#8250;</button>
 </main>
 
+<div class="info" id="infoBar">
+  <p class="sub">Photos rotate on their own &middot; open this page any time to join in</p>
+  <p class="hint" id="arrowHint">Use the arrows to look back or ahead — it returns to the live rotation after a few quiet seconds</p>
+  <a href="?view=tv" id="tvLink" target="_blank" rel="noopener">Open full-screen TV view</a>
+</div>
+
 <footer>
   <span class="dot live" id="statusDot"></span>
   <span id="statusText">live &middot; synced</span>
@@ -241,19 +286,28 @@
 const PHOTOS = PHOTO_FILES;
 const N = PHOTOS.length;
 
+/* TV / full-size view: ?view=tv strips the page down to just the photo.
+   Same sync logic underneath — just a different skin. */
+if (new URLSearchParams(location.search).get('view') === 'tv'){
+  document.body.classList.add('tv-mode');
+}
+
 /* =========================================================================
    SYNC CONFIG
    Every device — TV or guest phone — computes playback purely from elapsed
-   time since START_TIME. No login, no server, no shared state required.
+   time since START_TIME, a fixed calendar moment. This MUST be an absolute
+   timestamp, not "however long ago the page happened to load" — otherwise
+   two people opening the page at different moments get different states,
+   which defeats the whole point of syncing.
 
-   For the real event, set:
+   Right now this is set to a fixed TEST anchor so you and anyone else
+   testing today all see the same rotation. Before the real event, change
+   this one line to:
      const START_TIME = new Date("2026-09-19T12:00:00-04:00").getTime();
-   For this demo/testing, we anchor "now" to a fixed recent moment so that
-   opening this page in two different tabs/devices still lands on the exact
-   same photo — that's the sync guarantee in action.
+   (adjust the -04:00 if that's not Eastern time) — then everyone syncs to
+   the actual celebration start instead.
    ========================================================================= */
-const DEMO_ANCHOR_MINUTES_AGO = 3; // pretend the "event" started 3 min ago
-const START_TIME = Date.now() - DEMO_ANCHOR_MINUTES_AGO * 60 * 1000;
+const START_TIME = new Date("2026-09-01T00:00:00-04:00").getTime(); // TEST anchor — swap before the real event
 
 const MIN_DURATION = 8000;  // ms
 const MAX_DURATION = 12000; // ms
@@ -360,6 +414,12 @@ let manualTimer = null;
 
 function tick(){
   const elapsed = Date.now() - START_TIME;
+
+  if (elapsed < 0){
+    els.statusText.textContent = 'waiting for the celebration to begin';
+    els.statusDot.classList.remove('live');
+    return;
+  }
   advanceTo(elapsed);
 
   if (!manualMode){
