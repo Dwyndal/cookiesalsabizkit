@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carol Ann Vines Moore — A Celebration of Life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:        #1B1D22;
+    --panel:     #24272E;
+    --cream:     #F0E9DD;
+    --dim:       #9A9488;
+    --gold:      #C9A15E;
+    --line:      #34383F;
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg); color:var(--cream);
+    font-family:'Inter',sans-serif;
+  }
+  body{
+    display:flex; flex-direction:column;
+    min-height:100vh;
+    overflow-y:auto;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    flex: 0 0 auto;
+    text-align:center;
+    padding: clamp(18px, 4vh, 42px) 20px clamp(10px, 2vh, 20px);
+  }
+  header h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size: clamp(22px, 3.4vw, 40px);
+    letter-spacing: 0.01em;
+    margin: 0;
+    color: var(--cream);
+  }
+  header p.dates{
+    margin: 10px 0 0;
+    font-family:'Fraunces', serif;
+    font-size: clamp(13px, 1.5vw, 17px);
+    color: var(--gold);
+    font-weight:400;
+    letter-spacing: .02em;
+  }
+  header p.sub{
+    margin: 10px 0 0;
+    font-size: clamp(12px, 1.3vw, 15px);
+    color: var(--dim);
+    font-weight:400;
+  }
+  header p.hint{
+    margin: 4px 0 0;
+    font-size: clamp(11px, 1.1vw, 13px);
+    color: var(--dim);
+    font-weight:400;
+    opacity: .75;
+  }
+
+  /* ---------- stage ---------- */
+  main{
+    flex: 1 1 auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap: clamp(10px, 2.4vw, 34px);
+    padding: 0 clamp(10px, 3vw, 40px);
+    min-height:0;
+  }
+
+  .pane{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:10px;
+    transition: opacity .5s ease;
+  }
+  .pane .frame{
+    position:relative;
+    border-radius: 10px;
+    overflow:hidden;
+    background:var(--panel);
+    box-shadow: 0 0 0 1px var(--line);
+  }
+  .pane .frame .bg{
+    position:absolute; inset:-10%;
+    background-size:cover;
+    background-position:center;
+    filter: blur(26px) brightness(.55) saturate(1.05);
+    transform: scale(1.15);
+  }
+  .pane .frame img{
+    position:relative;
+    width:100%; height:100%;
+    object-fit:contain;
+    display:block;
+  }
+  .pane .tag{
+    font-size: 10px;
+    color: var(--dim);
+  }
+  .badge{
+    position:absolute;
+    top: 8px; left: 8px;
+    z-index: 2;
+    background: rgba(0,0,0,.45);
+    color: var(--cream);
+    font-size: 11px;
+    letter-spacing: .02em;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-variant-numeric: tabular-nums;
+  }
+  .pane.side .badge{ font-size: 9px; padding: 2px 6px; }
+
+  /* Frame sizing uses aspect-ratio + vw only (never vh) so it can't blow up
+     or overlap other elements in short/unusual viewports (e.g. embedded
+     previews). Height always follows from width. */
+  .pane.side{ opacity:.5; }
+  .pane.side .frame{
+    width: clamp(64px, 11vw, 130px);
+    aspect-ratio: 4 / 5;
+  }
+  .pane.center .frame{
+    width: clamp(220px, 40vw, 480px);
+    aspect-ratio: 4 / 5;
+    box-shadow: 0 0 0 1px var(--line), 0 18px 50px rgba(0,0,0,.45);
+  }
+
+  /* ---------- controls ---------- */
+  .arrow{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--cream);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    flex: 0 0 auto;
+    transition: border-color .2s, transform .15s;
+  }
+  .arrow:hover{ border-color: var(--gold); }
+  .arrow:active{ transform: scale(.92); }
+
+  /* ---------- footer status ---------- */
+  footer{
+    flex: 0 0 auto;
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    padding: clamp(10px,2vh,20px) 20px clamp(16px,3vh,28px);
+    font-size: 12px;
+    color: var(--dim);
+  }
+  .dot{ width:6px; height:6px; border-radius:50%; background: var(--gold); }
+  .dot.live{ animation: pulse 1.8s infinite ease-in-out; }
+  @keyframes pulse{ 0%,100%{opacity:.35} 50%{opacity:1} }
+  #resumeBtn{
+    display:none;
+    background: var(--panel);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family:'Inter',sans-serif;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor:pointer;
+  }
+
+  @media (max-width: 640px){
+    .pane.side{ display:none; }
+    main{ gap: 14px; }
+    .pane.center .frame{ width: min(78vw, 340px); }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Carol Ann Vines Moore</h1>
+  <p class="dates">April 28, 1945 — August 20, 2026</p>
+  <p class="sub">Photos rotate on their own &middot; open this page any time to join in</p>
+  <p class="hint" id="arrowHint">Use the arrows to look back or ahead — it returns to the live rotation after a few quiet seconds</p>
+</header>
+
+<main>
+  <button class="arrow" id="prevBtn" aria-label="Previous photo">&#8249;</button>
+
+  <div class="pane side" id="paneLeft">
+    <div class="frame">
+      <div class="bg"></div>
+      <span class="badge" id="badgeLeft"></span>
+      <img alt="">
+    </div>
+    <span class="tag">just played</span>
+  </div>
+
+  <div class="pane center" id="paneCenter">
+    <div class="frame">
+      <div class="bg"></div>
+      <span class="badge" id="badgeCenter"></span>
+      <img alt="">
+    </div>
+  </div>
+
+  <div class="pane side" id="paneRight">
+    <div class="frame">
+      <div class="bg"></div>
+      <span class="badge" id="badgeRight"></span>
+      <img alt="">
+    </div>
+    <span class="tag">up next</span>
+  </div>
+
+  <button class="arrow" id="nextBtn" aria-label="Next photo">&#8250;</button>
+</main>
+
+<footer>
+  <span class="dot live" id="statusDot"></span>
+  <span id="statusText">live &middot; synced</span>
+  <button id="resumeBtn">back to live</button>
+</footer>
+
+<!-- manifest.js defines PHOTO_FILES — edit that file to add/remove photos.
+     Loaded as a plain <script>, not fetch(), so this page also works when
+     just double-clicked open from a folder (no local server required). -->
+<script src="manifest.js"></script>
+<script>
+/* =========================================================================
+   PHOTO LIBRARY
+   PHOTO_FILES comes from manifest.js. Each photo's badge number is its
+   fixed position in that list (1-based) — permanent, independent of the
+   shuffle, so "photo #14" always means the same picture.
+   ========================================================================= */
+const PHOTOS = PHOTO_FILES;
+const N = PHOTOS.length;
+
+/* =========================================================================
+   SYNC CONFIG
+   Every device — TV or guest phone — computes playback purely from elapsed
+   time since START_TIME. No login, no server, no shared state required.
+
+   For the real event, set:
+     const START_TIME = new Date("2026-09-19T12:00:00-04:00").getTime();
+   For this demo/testing, we anchor "now" to a fixed recent moment so that
+   opening this page in two different tabs/devices still lands on the exact
+   same photo — that's the sync guarantee in action.
+   ========================================================================= */
+const DEMO_ANCHOR_MINUTES_AGO = 3; // pretend the "event" started 3 min ago
+const START_TIME = Date.now() - DEMO_ANCHOR_MINUTES_AGO * 60 * 1000;
+
+const MIN_DURATION = 8000;  // ms
+const MAX_DURATION = 12000; // ms
+const RESUME_AFTER_IDLE_MS = 8000; // how long manual browsing lasts before returning to live
+
+document.getElementById('arrowHint').textContent =
+  `Use the arrows to look back or ahead — it returns to the live rotation after ${Math.round(RESUME_AFTER_IDLE_MS/1000)} quiet seconds`;
+
+/* ---- deterministic PRNG (mulberry32) so every device agrees ---- */
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function seededShuffle(arr, seed){
+  const rnd = mulberry32(seed);
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(rnd() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* order/duration for a given "pass" (one full shuffle through all photos) */
+const orderCache = new Map();
+function passOrder(passIndex){
+  if (!orderCache.has(passIndex)){
+    const base = [...Array(N).keys()];
+    orderCache.set(passIndex, seededShuffle(base, passIndex + 1));
+  }
+  return orderCache.get(passIndex);
+}
+function stepDuration(passIndex, posInPass){
+  const rnd = mulberry32(passIndex * 1000 + posInPass + 7919);
+  return MIN_DURATION + rnd() * (MAX_DURATION - MIN_DURATION);
+}
+/* photo index shown at global step i (i = 0,1,2,... forever) */
+function photoAtStep(i){
+  const passIndex = Math.floor(i / N);
+  const pos = i % N;
+  return passOrder(passIndex)[pos];
+}
+function durationAtStep(i){
+  const passIndex = Math.floor(i / N);
+  const pos = i % N;
+  return stepDuration(passIndex, pos);
+}
+
+/* ---- walk forward from cached position to find current step ---- */
+let cursor = { step: 0, stepStartMs: 0 }; // stepStartMs = elapsed ms when step began
+function advanceTo(elapsed){
+  while (cursor.stepStartMs + durationAtStep(cursor.step) <= elapsed){
+    cursor.stepStartMs += durationAtStep(cursor.step);
+    cursor.step += 1;
+  }
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+const els = {
+  prevImg: document.querySelector('#paneLeft img'),
+  prevBg: document.querySelector('#paneLeft .bg'),
+  prevBadge: document.getElementById('badgeLeft'),
+  curImg: document.querySelector('#paneCenter img'),
+  curBg: document.querySelector('#paneCenter .bg'),
+  curBadge: document.getElementById('badgeCenter'),
+  nextImg: document.querySelector('#paneRight img'),
+  nextBg: document.querySelector('#paneRight .bg'),
+  nextBadge: document.getElementById('badgeRight'),
+  statusText: document.getElementById('statusText'),
+  statusDot: document.getElementById('statusDot'),
+  resumeBtn: document.getElementById('resumeBtn'),
+};
+
+function paint(step){
+  const cur = photoAtStep(step);
+  const prev = photoAtStep(step - 1);
+  const next = photoAtStep(step + 1);
+
+  els.curImg.src = PHOTOS[cur];
+  els.curBg.style.backgroundImage = `url(${PHOTOS[cur]})`;
+  els.curBadge.textContent = String(cur + 1).padStart(2, '0');
+
+  els.prevImg.src = PHOTOS[prev];
+  els.prevBg.style.backgroundImage = `url(${PHOTOS[prev]})`;
+  els.prevBadge.textContent = String(prev + 1).padStart(2, '0');
+
+  els.nextImg.src = PHOTOS[next];
+  els.nextBg.style.backgroundImage = `url(${PHOTOS[next]})`;
+  els.nextBadge.textContent = String(next + 1).padStart(2, '0');
+}
+
+/* =========================================================================
+   PLAYBACK LOOP + MANUAL OVERRIDE
+   ========================================================================= */
+let manualOffset = 0;     // temporary browse offset from live step
+let manualMode = false;
+let manualTimer = null;
+
+function tick(){
+  const elapsed = Date.now() - START_TIME;
+  advanceTo(elapsed);
+
+  if (!manualMode){
+    paint(cursor.step);
+  }
+}
+let lastPaintSecond = -1;
+function loop(){
+  const nowSec = Math.floor(Date.now()/1000);
+  if (nowSec !== lastPaintSecond){
+    lastPaintSecond = nowSec;
+    tick();
+  }
+  requestAnimationFrame(loop);
+}
+loop();
+
+function enterManual(delta){
+  manualMode = true;
+  manualOffset += delta;
+  paint(cursor.step + manualOffset);
+  els.statusDot.classList.remove('live');
+  els.statusText.textContent = 'previewing \u2014 not live';
+  els.resumeBtn.style.display = 'inline-block';
+  clearTimeout(manualTimer);
+  manualTimer = setTimeout(returnToLive, RESUME_AFTER_IDLE_MS);
+}
+function returnToLive(){
+  manualMode = false;
+  manualOffset = 0;
+  els.statusDot.classList.add('live');
+  els.statusText.textContent = 'live \u00b7 synced';
+  els.resumeBtn.style.display = 'none';
+  paint(cursor.step);
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => enterManual(-1));
+document.getElementById('nextBtn').addEventListener('click', () => enterManual(1));
+els.resumeBtn.addEventListener('click', returnToLive);
+</script>
+</body>
+</html>
