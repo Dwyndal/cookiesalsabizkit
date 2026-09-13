@@ -435,7 +435,7 @@ const START_TIME = urlStart ? new Date(urlStart).getTime() : DEFAULT_START_TIME;
 
 const MIN_DURATION = 10000; // ms
 const MAX_DURATION = 10000; // ms — same as MIN, so every photo holds exactly 10s
-const RESUME_AFTER_IDLE_MS = 8000; // how long manual browsing lasts before returning to live
+const RESUME_AFTER_IDLE_MS = 10000; // how long manual browsing lasts before returning to live — matches the per-photo cycle time
 
 document.getElementById('arrowHint').textContent =
   `Use the arrows to look back or ahead — it returns to the live rotation after ${Math.round(RESUME_AFTER_IDLE_MS/1000)} quiet seconds`;
