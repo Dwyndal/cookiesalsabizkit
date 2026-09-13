@@ -239,6 +239,7 @@
     padding: 4px 6px;
     border-radius: 6px;
     text-align: center;
+    transition: border-color .2s;
   }
   #jumpBox input::-webkit-outer-spin-button,
   #jumpBox input::-webkit-inner-spin-button{
@@ -561,15 +562,25 @@ function loop(){
 }
 loop();
 
-function enterManual(delta){
+/* setManualStep: jump to an ABSOLUTE step, replacing any prior manual
+   offset outright. This is what "go to a specific photo" needs — repeating
+   the same jump always lands on the same photo, no drift.
+   enterManual: used by the arrows, which are relative to whatever is
+   CURRENTLY on screen (so "next" twice moves two photos forward from your
+   last spot, not from wherever the live background clock has drifted to). */
+function setManualStep(absoluteStep){
   manualMode = true;
-  manualOffset += delta;
-  paint(cursor.step + manualOffset);
+  manualOffset = absoluteStep - cursor.step;
+  paint(absoluteStep);
   els.statusDot.classList.remove('live');
   els.statusText.textContent = 'previewing \u2014 not live';
   els.resumeBtn.style.display = 'inline-block';
   clearTimeout(manualTimer);
   manualTimer = setTimeout(returnToLive, RESUME_AFTER_IDLE_MS);
+}
+function enterManual(delta){
+  const currentlyDisplayed = cursor.step + manualOffset;
+  setManualStep(currentlyDisplayed + delta);
 }
 function returnToLive(){
   manualMode = false;
@@ -584,16 +595,23 @@ document.getElementById('prevBtn').addEventListener('click', () => enterManual(-
 document.getElementById('nextBtn').addEventListener('click', () => enterManual(1));
 els.resumeBtn.addEventListener('click', returnToLive);
 
-/* Jump to a specific photo by its badge number. Finds the nearest upcoming
-   occurrence of that photo in the shuffle sequence, then reuses the same
-   manual-preview mechanism the arrows use (including the same auto-return
-   to live after RESUME_AFTER_IDLE_MS). */
+/* Jump to a specific photo by its badge number (1..N, no leading zero
+   needed — "4" and "04" both work). Finds the nearest upcoming occurrence
+   of that photo in the shuffle sequence and jumps straight to it, reusing
+   the same manual-preview mechanism the arrows use, including the same
+   auto-return to live after RESUME_AFTER_IDLE_MS. Repeating the same
+   number always lands on the same photo. */
 function jumpToPhoto(num){
+  const input = document.getElementById('jumpInput');
+  if (!Number.isInteger(num) || num < 1 || num > N){
+    input.style.borderColor = '#B85C4A';
+    setTimeout(() => { input.style.borderColor = ''; }, 1200);
+    return;
+  }
   const desired = num - 1; // badge numbers are 1-based
-  if (!Number.isInteger(desired) || desired < 0 || desired >= N) return;
   for (let d = 0; d < N; d++){
     if (photoAtStep(cursor.step + d) === desired){
-      enterManual(d);
+      setManualStep(cursor.step + d);
       return;
     }
   }
