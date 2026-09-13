@@ -221,6 +221,41 @@
   }
   #tvLink:hover{ color: var(--gold); border-color: var(--gold); }
 
+  #jumpBox{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--dim);
+  }
+  #jumpBox input{
+    width: 56px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    font-size: 13px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    text-align: center;
+  }
+  #jumpBox input::-webkit-outer-spin-button,
+  #jumpBox input::-webkit-inner-spin-button{
+    -webkit-appearance: none; margin: 0;
+  }
+  #jumpBox button{
+    background: var(--panel);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+  #jumpBox button:hover{ background: var(--gold); color: var(--bg); }
+
   /* Exit link — only shown while in TV mode, since that view otherwise
      has no way back to the normal page. Kept subtle (low opacity, small)
      so it doesn't distract during normal viewing, but sits somewhere
@@ -291,6 +326,11 @@
 <div class="info" id="infoBar">
   <p class="sub">Photos rotate on their own &middot; open this page any time to join in</p>
   <p class="hint" id="arrowHint">Use the arrows to look back or ahead — it returns to the live rotation after a few quiet seconds</p>
+  <div id="jumpBox">
+    <label for="jumpInput">Looking for a specific one?</label>
+    <input type="number" id="jumpInput" min="1" placeholder="#">
+    <button id="jumpBtn">Go</button>
+  </div>
   <a href="?view=tv" id="tvLink" target="_blank" rel="noopener">Open full-screen TV view</a>
 </div>
 
@@ -360,6 +400,9 @@
    ========================================================================= */
 const PHOTOS = PHOTO_FILES;
 const N = PHOTOS.length;
+
+document.getElementById('jumpInput').max = String(N);
+document.getElementById('jumpInput').placeholder = `1-${N}`;
 
 /* TV / full-size view: ?view=tv strips the page down to just the photo.
    Same sync logic underneath — just a different skin. */
@@ -540,6 +583,31 @@ function returnToLive(){
 document.getElementById('prevBtn').addEventListener('click', () => enterManual(-1));
 document.getElementById('nextBtn').addEventListener('click', () => enterManual(1));
 els.resumeBtn.addEventListener('click', returnToLive);
+
+/* Jump to a specific photo by its badge number. Finds the nearest upcoming
+   occurrence of that photo in the shuffle sequence, then reuses the same
+   manual-preview mechanism the arrows use (including the same auto-return
+   to live after RESUME_AFTER_IDLE_MS). */
+function jumpToPhoto(num){
+  const desired = num - 1; // badge numbers are 1-based
+  if (!Number.isInteger(desired) || desired < 0 || desired >= N) return;
+  for (let d = 0; d < N; d++){
+    if (photoAtStep(cursor.step + d) === desired){
+      enterManual(d);
+      return;
+    }
+  }
+}
+document.getElementById('jumpBtn').addEventListener('click', () => {
+  const val = parseInt(document.getElementById('jumpInput').value, 10);
+  jumpToPhoto(val);
+});
+document.getElementById('jumpInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter'){
+    const val = parseInt(e.target.value, 10);
+    jumpToPhoto(val);
+  }
+});
 
 /* Debug panel — only shown with ?debug=1, never for real guests */
 if (new URLSearchParams(location.search).get('debug') === '1'){

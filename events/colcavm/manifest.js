@@ -83,4 +83,11 @@ const PHOTO_FILES = [
   "photos/photo_79.jpg",
   "photos/photo_80.jpg",
   "photos/photo_81.jpg",
+  "photos/photo_82.jpg",
+  "photos/photo_83.jpg",
+  "photos/photo_84.jpg",
+  "photos/photo_85.jpg",
+  "photos/photo_86.jpg",
+  "photos/photo_87.jpg",
+  "photos/photo_88.jpg",
 ];
