@@ -309,8 +309,8 @@ if (new URLSearchParams(location.search).get('view') === 'tv'){
    ========================================================================= */
 const START_TIME = new Date("2026-09-01T00:00:00-04:00").getTime(); // TEST anchor — swap before the real event
 
-const MIN_DURATION = 8000;  // ms
-const MAX_DURATION = 12000; // ms
+const MIN_DURATION = 10000; // ms
+const MAX_DURATION = 10000; // ms — same as MIN, so every photo holds exactly 10s
 const RESUME_AFTER_IDLE_MS = 8000; // how long manual browsing lasts before returning to live
 
 document.getElementById('arrowHint').textContent =
