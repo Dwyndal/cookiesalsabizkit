@@ -257,6 +257,40 @@
   }
   #jumpBox button:hover{ background: var(--gold); color: var(--bg); }
 
+  /* Lightbox: tap the center photo to see it larger. */
+  .pane.center .frame img{ cursor: zoom-in; }
+  #lightbox{
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0,0,0,.88);
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+  }
+  #lightbox.open{ display: flex; }
+  #lightbox img{
+    max-width: 92vw;
+    max-height: 92vh;
+    object-fit: contain;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    border-radius: 6px;
+  }
+  #lightboxClose{
+    position: fixed;
+    top: 18px; right: 22px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--cream);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  #lightboxClose:hover{ border-color: var(--gold); color: var(--gold); }
+
   /* Exit link — only shown while in TV mode, since that view otherwise
      has no way back to the normal page. Kept subtle (low opacity, small)
      so it doesn't distract during normal viewing, but sits somewhere
@@ -323,6 +357,13 @@
 
   <button class="arrow" id="nextBtn" aria-label="Next photo">&#8250;</button>
 </main>
+
+<!-- Lightbox: click the center photo to see it larger. Hidden by default. -->
+<div id="lightbox">
+  <button id="lightboxClose" aria-label="Close zoomed view">&times;</button>
+  <img id="lightboxImg" alt="">
+</div>
+
 
 <div class="info" id="infoBar">
   <p class="sub">Photos rotate on their own &middot; open this page any time to join in</p>
@@ -441,6 +482,11 @@ const RESUME_AFTER_IDLE_MS = 10000; // how long manual browsing lasts before ret
 document.getElementById('arrowHint').textContent =
   `Use the arrows to look back or ahead — it returns to the live rotation after ${Math.round(RESUME_AFTER_IDLE_MS/1000)} quiet seconds`;
 
+/* Set to false to show photos in plain 01..N order, looping forever —
+   useful when the client wants to review/browse in a predictable order.
+   Flip back to true to restore the normal shuffled playback. */
+const SHUFFLE_ENABLED = false;
+
 /* ---- deterministic PRNG (mulberry32) so every device agrees ---- */
 function mulberry32(seed){
   return function(){
@@ -465,7 +511,7 @@ const orderCache = new Map();
 function passOrder(passIndex){
   if (!orderCache.has(passIndex)){
     const base = [...Array(N).keys()];
-    orderCache.set(passIndex, seededShuffle(base, passIndex + 1));
+    orderCache.set(passIndex, SHUFFLE_ENABLED ? seededShuffle(base, passIndex + 1) : base);
   }
   return orderCache.get(passIndex);
 }
@@ -609,7 +655,7 @@ function jumpToPhoto(num){
     return;
   }
   const desired = num - 1; // badge numbers are 1-based
-  for (let d = 0; d < N; d++){
+  for (let d = 0; d < N * 2; d++){
     if (photoAtStep(cursor.step + d) === desired){
       setManualStep(cursor.step + d);
       return;
@@ -625,6 +671,20 @@ document.getElementById('jumpInput').addEventListener('keydown', (e) => {
     const val = parseInt(e.target.value, 10);
     jumpToPhoto(val);
   }
+});
+
+/* Lightbox — click the center photo to see it larger, click anywhere (or
+   the X) to close. Works whether the carousel is live or previewing. */
+const lightbox = document.getElementById('lightbox');
+const lightboxImg = document.getElementById('lightboxImg');
+els.curImg.addEventListener('click', () => {
+  lightboxImg.src = els.curImg.src;
+  lightbox.classList.add('open');
+});
+lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+document.getElementById('lightboxClose').addEventListener('click', (e) => {
+  e.stopPropagation();
+  lightbox.classList.remove('open');
 });
 
 /* Debug panel — only shown with ?debug=1, never for real guests */
