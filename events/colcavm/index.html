@@ -195,7 +195,8 @@
   body.tv-mode footer,
   body.tv-mode .info,
   body.tv-mode .pane.side,
-  body.tv-mode .arrow{
+  body.tv-mode .arrow,
+  body.tv-mode #debugPanel{
     display: none;
   }
   body.tv-mode main{ padding:0; }
@@ -299,6 +300,53 @@
   <button id="resumeBtn">back to live</button>
 </footer>
 
+<!-- Debug-only panel: add ?debug=1 to the URL to see this. Never shown to
+     regular guests. Lets you generate a link that anchors sync to "right
+     now" — share the exact same link with a second device to test sync
+     on demand, without editing or pushing any code. -->
+<div id="debugPanel" style="display:none;">
+  <p>Testing tool — not visible without <code>?debug=1</code></p>
+  <button id="genTestLinkBtn">Generate a test link (starts now)</button>
+  <input type="text" id="testLinkOutput" readonly>
+  <p class="note">Open the exact same link on a second device — both will land on the same photo at the same time.</p>
+</div>
+
+<style>
+  #debugPanel{
+    max-width: 480px;
+    margin: 20px auto 0;
+    padding: 14px 18px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--dim);
+  }
+  #debugPanel button{
+    background: var(--panel);
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 6px 0;
+  }
+  #testLinkOutput{
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    color: var(--cream);
+    font-size: 11px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    margin-top: 6px;
+  }
+  #debugPanel .note{ margin: 8px 0 0; opacity: .75; }
+</style>
+
 <!-- manifest.js defines PHOTO_FILES — edit that file to add/remove photos.
      Loaded as a plain <script>, not fetch(), so this page also works when
      just double-clicked open from a folder (no local server required). -->
@@ -327,14 +375,20 @@ if (new URLSearchParams(location.search).get('view') === 'tv'){
    two people opening the page at different moments get different states,
    which defeats the whole point of syncing.
 
-   Right now this is set to a fixed TEST anchor so you and anyone else
-   testing today all see the same rotation. Before the real event, change
-   this one line to:
-     const START_TIME = new Date("2026-09-19T12:00:00-04:00").getTime();
-   (adjust the -04:00 if that's not Eastern time) — then everyone syncs to
-   the actual celebration start instead.
+   DEFAULT_START_TIME is what's used normally (and what real guests get).
+   Before the real event, change the line below to:
+     const DEFAULT_START_TIME = new Date("2026-09-19T12:00:00-04:00").getTime();
+
+   For testing sync on demand without editing/pushing code, this page also
+   accepts a ?start=<ISO timestamp> URL parameter that overrides the default
+   for that page load only. Use the "Generate a test link" panel below
+   (?debug=1) to create one that starts from the moment you click — share
+   that exact link with a second device and both will be perfectly in sync.
    ========================================================================= */
-const START_TIME = new Date("2026-09-01T00:00:00-04:00").getTime(); // TEST anchor — swap before the real event
+const DEFAULT_START_TIME = new Date("2026-09-01T00:00:00-04:00").getTime(); // TEST anchor — swap before the real event
+
+const urlStart = new URLSearchParams(location.search).get('start');
+const START_TIME = urlStart ? new Date(urlStart).getTime() : DEFAULT_START_TIME;
 
 const MIN_DURATION = 10000; // ms
 const MAX_DURATION = 10000; // ms — same as MIN, so every photo holds exactly 10s
@@ -486,6 +540,22 @@ function returnToLive(){
 document.getElementById('prevBtn').addEventListener('click', () => enterManual(-1));
 document.getElementById('nextBtn').addEventListener('click', () => enterManual(1));
 els.resumeBtn.addEventListener('click', returnToLive);
+
+/* Debug panel — only shown with ?debug=1, never for real guests */
+if (new URLSearchParams(location.search).get('debug') === '1'){
+  document.getElementById('debugPanel').style.display = 'block';
+  document.getElementById('genTestLinkBtn').addEventListener('click', () => {
+    const url = new URL(location.href);
+    url.searchParams.set('start', new Date().toISOString());
+    url.searchParams.delete('debug'); // the shared test link itself doesn't need debug mode on
+    const out = document.getElementById('testLinkOutput');
+    out.value = url.toString();
+    out.select();
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url.toString()).catch(() => {});
+    }
+  });
+}
 </script>
 </body>
 </html>
