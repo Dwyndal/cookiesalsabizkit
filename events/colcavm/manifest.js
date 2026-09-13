@@ -2,6 +2,16 @@
 // Order in this list has no effect on playback order (that's shuffled) —
 // it only sets each photo's permanent reference number.
 const PHOTO_FILES = [
+  "photos/IMG_0062.JPG",
+  "photos/IMG_0219.JPG",
+  "photos/IMG_0228.JPG",
+  "photos/IMG_0247.JPG",
+  "photos/IMG_0261.JPG",
+  "photos/IMG_0810.JPG",
+  "photos/IMG_0896.JPG",
+  "photos/IMG_2263.JPG",
+  "photos/IMG_2353.JPG",
+  "photos/IMG_2653.JPG",
   "photos/photo_01.jpg",
   "photos/photo_02.jpg",
   "photos/photo_03.jpg",
