@@ -257,40 +257,6 @@
   }
   #jumpBox button:hover{ background: var(--gold); color: var(--bg); }
 
-  /* Lightbox: tap the center photo to see it larger. */
-  .pane.center .frame img{ cursor: zoom-in; }
-  #lightbox{
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    background: rgba(0,0,0,.88);
-    align-items: center;
-    justify-content: center;
-    cursor: zoom-out;
-  }
-  #lightbox.open{ display: flex; }
-  #lightbox img{
-    max-width: 92vw;
-    max-height: 92vh;
-    object-fit: contain;
-    box-shadow: 0 20px 60px rgba(0,0,0,.6);
-    border-radius: 6px;
-  }
-  #lightboxClose{
-    position: fixed;
-    top: 18px; right: 22px;
-    background: transparent;
-    border: 1px solid var(--line);
-    color: var(--cream);
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    font-size: 22px;
-    line-height: 1;
-    cursor: pointer;
-  }
-  #lightboxClose:hover{ border-color: var(--gold); color: var(--gold); }
-
   /* Exit link — only shown while in TV mode, since that view otherwise
      has no way back to the normal page. Kept subtle (low opacity, small)
      so it doesn't distract during normal viewing, but sits somewhere
@@ -357,13 +323,6 @@
 
   <button class="arrow" id="nextBtn" aria-label="Next photo">&#8250;</button>
 </main>
-
-<!-- Lightbox: click the center photo to see it larger. Hidden by default. -->
-<div id="lightbox">
-  <button id="lightboxClose" aria-label="Close zoomed view">&times;</button>
-  <img id="lightboxImg" alt="">
-</div>
-
 
 <div class="info" id="infoBar">
   <p class="sub">Photos rotate on their own &middot; open this page any time to join in</p>
@@ -666,20 +625,6 @@ document.getElementById('jumpInput').addEventListener('keydown', (e) => {
     const val = parseInt(e.target.value, 10);
     jumpToPhoto(val);
   }
-});
-
-/* Lightbox — click the center photo to see it larger, click anywhere (or
-   the X) to close. Works whether the carousel is live or previewing. */
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightboxImg');
-els.curImg.addEventListener('click', () => {
-  lightboxImg.src = els.curImg.src;
-  lightbox.classList.add('open');
-});
-lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
-document.getElementById('lightboxClose').addEventListener('click', (e) => {
-  e.stopPropagation();
-  lightbox.classList.remove('open');
 });
 
 /* Debug panel — only shown with ?debug=1, never for real guests */
