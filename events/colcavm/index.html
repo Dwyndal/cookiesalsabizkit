@@ -127,6 +127,25 @@
   }
   .pane.side .badge{ font-size: 9px; padding: 2px 6px; }
 
+  .caption{
+    position:absolute;
+    left:0; right:0; bottom:0;
+    z-index: 2;
+    padding: 18px 12px 8px;
+    text-align:center;
+    font-family:'Fraunces', serif;
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: .02em;
+    color: var(--gold);
+    background: linear-gradient(to top, rgba(0,0,0,.55), transparent);
+    pointer-events: none; /* never intercepts the zoom click */
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  .caption.show{ opacity: 1; }
+  @media (min-width: 700px){ .caption{ font-size: 16px; padding-top: 26px; } }
+
   /* Frame sizing uses aspect-ratio + vw only (never vh) so it can't blow up
      or overlap other elements in short/unusual viewports (e.g. embedded
      previews). Height always follows from width. */
@@ -343,6 +362,7 @@
       <div class="bg"></div>
       <span class="badge" id="badgeCenter"></span>
       <img alt="">
+      <span class="caption" id="captionCenter"></span>
     </div>
   </div>
 
@@ -442,6 +462,14 @@
    ========================================================================= */
 const PHOTOS = PHOTO_FILES;
 const N = PHOTOS.length;
+
+/* Optional name labels, keyed by badge number (1-based). Add/remove entries
+   here any time — a badge with no entry just shows no caption. */
+const PHOTO_NAMES = {
+  107: "Elizabeth Taylor",
+  108: "Kenny Rogers",
+  115: "Lorrie Morgan",
+};
 
 document.getElementById('jumpInput').max = String(N);
 document.getElementById('jumpInput').placeholder = `1-${N}`;
@@ -549,6 +577,7 @@ const els = {
   prevBadge: document.getElementById('badgeLeft'),
   curImg: document.querySelector('#paneCenter img'),
   curBg: document.querySelector('#paneCenter .bg'),
+  curCaption: document.querySelector('#paneCenter .caption'),
   curBadge: document.getElementById('badgeCenter'),
   nextImg: document.querySelector('#paneRight img'),
   nextBg: document.querySelector('#paneRight .bg'),
@@ -566,6 +595,9 @@ function paint(step){
   els.curImg.src = PHOTOS[cur];
   els.curBg.style.backgroundImage = `url(${PHOTOS[cur]})`;
   els.curBadge.textContent = String(cur + 1).padStart(2, '0');
+  const name = PHOTO_NAMES[cur + 1];
+  els.curCaption.textContent = name || '';
+  els.curCaption.classList.toggle('show', !!name);
 
   els.prevImg.src = PHOTOS[prev];
   els.prevBg.style.backgroundImage = `url(${PHOTOS[prev]})`;
