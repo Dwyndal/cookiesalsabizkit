@@ -470,10 +470,13 @@ const N = PHOTOS.length;
 
 /* Optional name labels, keyed by badge number (1-based). Add/remove entries
    here any time — a badge with no entry just shows no caption. */
+/* Optional name labels, keyed by FILENAME (not badge number) — badge numbers
+   shift whenever photos are added/removed, but filenames don't. Add/remove
+   entries here any time; a photo with no entry just shows no caption. */
 const PHOTO_NAMES = {
-  107: "Elizabeth Taylor",
-  108: "Kenny Rogers",
-  115: "Lorrie Morgan",
+  "photo_62.jpg": "Elizabeth Taylor",
+  "photo_63.jpg": "Kenny Rogers",
+  "photo_70.jpg": "Lorrie Morgan",
 };
 
 document.getElementById('jumpInput').max = String(N);
@@ -503,7 +506,7 @@ if (new URLSearchParams(location.search).get('view') === 'tv'){
    (?debug=1) to create one that starts from the moment you click — share
    that exact link with a second device and both will be perfectly in sync.
    ========================================================================= */
-const DEFAULT_START_TIME = new Date("2026-09-18T00:10:47-04:00").getTime(); // temporary anchor, set 10 min after push
+const DEFAULT_START_TIME = new Date("2026-09-19T12:00:00-04:00").getTime(); // real event anchor
 
 const urlStart = new URLSearchParams(location.search).get('start');
 const START_TIME = urlStart ? new Date(urlStart).getTime() : DEFAULT_START_TIME;
@@ -600,7 +603,7 @@ function paint(step){
   els.curImg.src = PHOTOS[cur];
   els.curBg.style.backgroundImage = `url(${PHOTOS[cur]})`;
   els.curBadge.textContent = String(cur + 1).padStart(2, '0');
-  const name = PHOTO_NAMES[cur + 1];
+  const name = PHOTO_NAMES[PHOTO_FILES[cur].replace('photos/', '')];
   els.curCaption.textContent = name || '';
   els.curCaption.classList.toggle('show', !!name);
 
