@@ -60,7 +60,6 @@ const PHOTO_FILES = [
   "photos/photo_11.jpg",
   "photos/photo_12.jpg",
   "photos/photo_13.jpg",
-  "photos/photo_14.jpg",
   "photos/photo_15.jpg",
   "photos/photo_16.jpg",
   "photos/photo_17.jpg",
