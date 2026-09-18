@@ -460,7 +460,12 @@
    fixed position in that list (1-based) — permanent, independent of the
    shuffle, so "photo #14" always means the same picture.
    ========================================================================= */
-const PHOTOS = PHOTO_FILES;
+/* Bump this any time you push a photo REPLACEMENT (not a new addition) —
+   it forces every browser to re-fetch the image instead of reusing an old
+   cached copy for that filename. Additions don't need a bump since a new
+   filename was never cached before. */
+const ASSET_VERSION = 2;
+const PHOTOS = PHOTO_FILES.map(p => `${p}?v=${ASSET_VERSION}`);
 const N = PHOTOS.length;
 
 /* Optional name labels, keyed by badge number (1-based). Add/remove entries
