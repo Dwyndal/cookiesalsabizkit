@@ -464,7 +464,7 @@
    it forces every browser to re-fetch the image instead of reusing an old
    cached copy for that filename. Additions don't need a bump since a new
    filename was never cached before. */
-const ASSET_VERSION = 2;
+const ASSET_VERSION = 3;
 const PHOTOS = PHOTO_FILES.map(p => `${p}?v=${ASSET_VERSION}`);
 const N = PHOTOS.length;
 
