@@ -503,7 +503,7 @@ if (new URLSearchParams(location.search).get('view') === 'tv'){
    (?debug=1) to create one that starts from the moment you click — share
    that exact link with a second device and both will be perfectly in sync.
    ========================================================================= */
-const DEFAULT_START_TIME = new Date("2026-09-01T00:00:00-04:00").getTime(); // TEST anchor — swap before the real event
+const DEFAULT_START_TIME = new Date("2026-09-18T00:10:47-04:00").getTime(); // temporary anchor, set 10 min after push
 
 const urlStart = new URLSearchParams(location.search).get('start');
 const START_TIME = urlStart ? new Date(urlStart).getTime() : DEFAULT_START_TIME;
